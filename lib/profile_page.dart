@@ -1,13 +1,15 @@
+// profile_page.dart
+
+import 'package:code_union_task/constants/app_styles.dart';
 import 'package:code_union_task/constants/global_class.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import 'constants/app_styles.dart';
+import 'service/auth_service.dart';
 import 'login_page.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+  const ProfilePage({Key? key}) : super(key: key);
   static const routeName = "/profile";
 
   @override
@@ -15,8 +17,6 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final FlutterSecureStorage storage = const FlutterSecureStorage();
-
   Future<void> _showLogoutDialog() async {
     return showCupertinoDialog(
       context: context,
@@ -33,7 +33,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             CupertinoDialogAction(
               onPressed: () {
-                _logout();
+                AuthService.logout();
                 Navigator.of(context).popUntil((route) => route.isFirst);
               },
               child: const Text('Выйти'),
@@ -42,11 +42,6 @@ class _ProfilePageState extends State<ProfilePage> {
         );
       },
     );
-  }
-
-  void _logout() {
-    storage.delete(key: "accessToken");
-    storage.delete(key: "refreshToken");
   }
 
   @override
@@ -68,7 +63,7 @@ class _ProfilePageState extends State<ProfilePage> {
         Flexible(
           flex: 40,
           child: Text(
-            GlobalClass.currentUSer.nickname!,
+            GlobalClass.currentUSer.nickname,
             style: TextStyle(
               color: Colors.black,
               fontFamily: AppStyles.fontFamilyManrope,
@@ -86,7 +81,7 @@ class _ProfilePageState extends State<ProfilePage> {
           flex: 22,
           child: FittedBox(
             child: Text(
-              GlobalClass.currentUSer.email!,
+              GlobalClass.currentUSer.email,
               style: TextStyle(
                 color: const Color(0XFF929292),
                 fontFamily: AppStyles.fontFamilyManrope,
@@ -102,16 +97,18 @@ class _ProfilePageState extends State<ProfilePage> {
           child: Container(),
         ),
         Flexible(
+          fit: FlexFit.tight,
           flex: 55,
           child: SizedBox(
             width: double.infinity,
             height: double.infinity,
             child: CupertinoButton(
               alignment: Alignment.centerLeft,
-              padding: const EdgeInsets.symmetric(vertical: 21, horizontal: 29),
+              padding: const EdgeInsets.symmetric(horizontal: 29, vertical: 21),
               color: Colors.white,
               onPressed: _showLogoutDialog,
               child: FittedBox(
+                fit: BoxFit.none,
                 child: Text(
                   "Выйти",
                   style: TextStyle(
