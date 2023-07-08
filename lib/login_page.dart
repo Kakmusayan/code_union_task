@@ -68,7 +68,8 @@ class _LoginPageState extends State<LoginPage> {
       setState(() {
         _isLoading = false;
       });
-
+      _loginController.clear();
+      _passwordController.clear();
       // ignore: use_build_context_synchronously
       Navigator.of(context).pushNamed(ProfilePage.routeName);
     } else {
@@ -104,6 +105,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void dispose() {
     _loginController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
@@ -132,6 +134,7 @@ class _LoginPageState extends State<LoginPage> {
             child: Container(),
           ),
           Flexible(
+            fit: FlexFit.tight,
             flex: 123,
             child: Column(
               children: [
