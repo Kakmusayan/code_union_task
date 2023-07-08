@@ -1,9 +1,11 @@
-import 'package:code_union_task/favorites_page.dart';
+// main.dart
+
 import 'package:code_union_task/lenta_page.dart';
 import 'package:code_union_task/map_page.dart';
 import 'package:code_union_task/profile_page.dart';
 import 'package:flutter/cupertino.dart';
 
+import 'favorites_page.dart';
 import 'login_page.dart';
 
 void main() {
@@ -11,35 +13,19 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return CupertinoApp(
       title: 'Code Union Task',
       theme: const CupertinoThemeData(
-        primaryColor: CupertinoColors.systemPurple,
+        primaryColor: Color(0XFF4631D2),
       ),
       initialRoute: LoginPage.routeName,
       routes: {
         LoginPage.routeName: (ctx) => const LoginPage(),
         ProfilePage.routeName: (ctx) => AppScreen(selectedIndex: 3),
-      },
-      onGenerateRoute: (settings) {
-        if (settings.name == LoginPage.routeName) {
-          return CupertinoPageRoute(
-            builder: (context) => const LoginPage(),
-          );
-        }
-        if (settings.name == ProfilePage.routeName) {
-          return CupertinoPageRoute(
-            builder: (context) => AppScreen(
-              selectedIndex: 3,
-            ),
-          );
-        }
-        return null;
       },
       onUnknownRoute: (settings) {
         return CupertinoPageRoute(
@@ -53,27 +39,27 @@ class MyApp extends StatelessWidget {
 // ignore: must_be_immutable
 class AppScreen extends StatefulWidget {
   static const routeNameHomePage = '/home';
-  int selectedIndex = 0;
+  int selectedIndex;
 
-  AppScreen({required this.selectedIndex, super.key});
+  AppScreen({required this.selectedIndex, Key? key}) : super(key: key);
 
   @override
-  State<AppScreen> createState() => _AppScreenState();
+  // ignore: library_private_types_in_public_api
+  _AppScreenState createState() => _AppScreenState();
 }
 
 class _AppScreenState extends State<AppScreen> {
-  String? currentPage;
-  int? currentIndex;
   List<String> pageTitles = ["Лента", "Карта", "Избранные", "Профиль"];
 
-  final List<Widget> _pageList = <Widget>[
-    const LentaPage(),
-    const MapPage(),
-    const FavoritesPage(),
-    const ProfilePage(),
+  final List<Widget> _pageList = const [
+    LentaPage(),
+    MapPage(),
+    FavoritesPage(),
+    ProfilePage(),
   ];
+
   void _onItemTapped(int index) {
-    return setState(() {
+    setState(() {
       widget.selectedIndex = index;
     });
   }
