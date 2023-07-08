@@ -1,12 +1,15 @@
 // login_page.dart
 
-import 'package:code_union_task/constants/app_styles.dart';
-import 'package:code_union_task/constants/global_class.dart';
-import 'package:code_union_task/profile_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'package:code_union_task/constants/app_styles.dart';
+import 'package:code_union_task/constants/global_class.dart';
+import 'package:code_union_task/profile_page.dart';
+import 'package:code_union_task/widgets/custom_cupertino_text_field.dart';
+
 import 'service/auth_service.dart';
+import 'widgets/custom_cupertino_button.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -180,75 +183,6 @@ class _LoginPageState extends State<LoginPage> {
             child: Container(),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class CustomCupertinoTextField extends StatelessWidget {
-  final String placeholder;
-  final TextInputType keyboardType;
-  final TextEditingController controller;
-  final bool obscureText;
-
-  const CustomCupertinoTextField({
-    Key? key,
-    required this.placeholder,
-    this.keyboardType = TextInputType.text,
-    required this.controller,
-    this.obscureText = false,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return CupertinoTextField(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-      ),
-      placeholder: placeholder,
-      placeholderStyle: TextStyle(
-        color: const Color(0xFFC3C3C3),
-        fontFamily: AppStyles.fontFamilyManrope,
-        fontSize: 16,
-        fontStyle: FontStyle.normal,
-        fontWeight: FontWeight.w400,
-      ),
-      keyboardType: keyboardType,
-      controller: controller,
-      obscureText: obscureText,
-    );
-  }
-}
-
-class CustomCupertinoButton extends StatelessWidget {
-  final Color color;
-  final String text;
-  final VoidCallback onPressed;
-
-  const CustomCupertinoButton({
-    Key? key,
-    required this.color,
-    required this.text,
-    required this.onPressed,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return CupertinoButton(
-      borderRadius: BorderRadius.circular(6.0),
-      color: color,
-      onPressed: onPressed,
-      child: FittedBox(
-        child: Text(
-          text,
-          style: TextStyle(
-            color: Colors.white,
-            fontFamily: AppStyles.fontFamilyManrope,
-            fontSize: 16,
-            fontStyle: FontStyle.normal,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
       ),
     );
   }
