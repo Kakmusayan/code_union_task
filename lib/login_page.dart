@@ -1,15 +1,12 @@
-import 'dart:convert';
+// login_page.dart
 
-import 'package:code_union_task/constants/api_constants.dart';
+import 'package:code_union_task/constants/app_styles.dart';
 import 'package:code_union_task/constants/global_class.dart';
 import 'package:code_union_task/profile_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import 'constants/app_styles.dart';
-import 'model.dart/user.dart';
+import 'service/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -24,60 +21,28 @@ class _LoginPageState extends State<LoginPage> {
 
   final _loginController = TextEditingController();
   final _passwordController = TextEditingController();
-  final FlutterSecureStorage storage = const FlutterSecureStorage();
-
-  final Map<String?, String?> _loginData = {
-    'email': "",
-    'password': "",
-  };
 
   Future<void> _submit() async {
     setState(() {
       _isLoading = true;
     });
-    final url = Uri.parse("${ApiConstants.baseUrl}/api/v1/auth/login");
 
-    final response = await http.post(
-      url,
-      body: json.encode(
-        {
-          "email": _loginData["email"],
-          "password": _loginData['password'],
-        },
-      ),
-      headers: {
-        'Content-Type': 'Application/json',
-      },
-    );
-    if (response.statusCode == 200) {
-      final responseData = json.decode(
-        utf8.decode(response.bodyBytes),
+    try {
+      GlobalClass.currentUSer = await AuthService.login(
+        _loginController.text,
+        _passwordController.text,
       );
-
-      storage.write(
-        key: 'accessToken',
-        value: responseData['tokens']["accessToken"],
-      );
-      storage.write(
-        key: 'refreshToken',
-        value: responseData['tokens']["refreshToken"],
-      );
-
-      GlobalClass.currentUSer = User.fromMap(responseData["user"]);
 
       setState(() {
         _isLoading = false;
       });
       _loginController.clear();
       _passwordController.clear();
+
       // ignore: use_build_context_synchronously
       Navigator.of(context).pushNamed(ProfilePage.routeName);
-    } else {
-      final responseData = json.decode(
-        utf8.decode(response.bodyBytes),
-      );
-      String errorMessage = responseData["message"];
-      showErrorMessage(errorMessage);
+    } catch (e) {
+      showErrorMessage(e.toString());
       setState(() {
         _isLoading = false;
       });
@@ -86,20 +51,22 @@ class _LoginPageState extends State<LoginPage> {
 
   void showErrorMessage(String errorText) {
     showCupertinoDialog(
-        context: context,
-        builder: (context) {
-          return CupertinoAlertDialog(
-            title: const Text('Ошибка'),
-            content: Text(errorText),
-            actions: <Widget>[
-              CupertinoButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('ok'))
-            ],
-          );
-        });
+      context: context,
+      builder: (context) {
+        return CupertinoAlertDialog(
+          title: const Text('Ошибка'),
+          content: Text(errorText),
+          actions: [
+            CupertinoButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('ok'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -138,23 +105,10 @@ class _LoginPageState extends State<LoginPage> {
             flex: 123,
             child: Column(
               children: [
-                //login
-                CupertinoTextField(
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                  ),
+                CustomCupertinoTextField(
                   placeholder: "Логин или почта",
-                  placeholderStyle: TextStyle(
-                    color: const Color(0xFFC3C3C3),
-                    fontFamily: AppStyles.fontFamilyManrope,
-                    fontSize: 16,
-                    fontStyle: FontStyle.normal,
-                    fontWeight: FontWeight.w400,
-                  ),
                   keyboardType: TextInputType.emailAddress,
                   controller: _loginController,
-
-                  // ignore: body_might_complete_normally_nullable
                 ),
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16.0),
@@ -163,20 +117,10 @@ class _LoginPageState extends State<LoginPage> {
                     color: Color(0XFFE0E6ED),
                   ),
                 ),
-                //password
-                CupertinoTextField(
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                  ),
+                CustomCupertinoTextField(
                   placeholder: "Пароль",
-                  placeholderStyle: TextStyle(
-                    color: const Color(0xFFC3C3C3),
-                    fontFamily: AppStyles.fontFamilyManrope,
-                    fontSize: 16,
-                    fontStyle: FontStyle.normal,
-                    fontWeight: FontWeight.w400,
-                  ),
                   controller: _passwordController,
+                  obscureText: true,
                 ),
               ],
             ),
@@ -196,32 +140,18 @@ class _LoginPageState extends State<LoginPage> {
                     child: SizedBox(
                       width: double.infinity,
                       height: double.infinity,
-                      child: CupertinoButton(
-                        borderRadius: BorderRadius.circular(6.0),
+                      child: CustomCupertinoButton(
                         color: const Color(0XFF4631D2),
+                        text: "Войти",
                         onPressed: () {
                           if (_loginController.text.isEmpty) {
                             showErrorMessage('Логин не введен');
                           } else if (_passwordController.text.isEmpty) {
                             showErrorMessage("Пароль не введен");
                           } else {
-                            _loginData['email'] = _loginController.text;
-                            _loginData['password'] = _passwordController.text;
                             _submit();
                           }
                         },
-                        child: FittedBox(
-                          child: Text(
-                            "Войти",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontFamily: AppStyles.fontFamilyManrope,
-                              fontSize: 16,
-                              fontStyle: FontStyle.normal,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
                       ),
                     ),
                   ),
@@ -237,22 +167,10 @@ class _LoginPageState extends State<LoginPage> {
               child: SizedBox(
                 width: double.infinity,
                 height: double.infinity,
-                child: CupertinoButton(
-                  borderRadius: BorderRadius.circular(6.0),
+                child: CustomCupertinoButton(
                   color: const Color(0XFF4631D2),
+                  text: "Зарегистрироваться",
                   onPressed: () {},
-                  child: FittedBox(
-                    child: Text(
-                      "Зарегистрироваться",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontFamily: AppStyles.fontFamilyManrope,
-                        fontSize: 16,
-                        fontStyle: FontStyle.normal,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
                 ),
               ),
             ),
@@ -262,6 +180,75 @@ class _LoginPageState extends State<LoginPage> {
             child: Container(),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class CustomCupertinoTextField extends StatelessWidget {
+  final String placeholder;
+  final TextInputType keyboardType;
+  final TextEditingController controller;
+  final bool obscureText;
+
+  const CustomCupertinoTextField({
+    Key? key,
+    required this.placeholder,
+    this.keyboardType = TextInputType.text,
+    required this.controller,
+    this.obscureText = false,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoTextField(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+      ),
+      placeholder: placeholder,
+      placeholderStyle: TextStyle(
+        color: const Color(0xFFC3C3C3),
+        fontFamily: AppStyles.fontFamilyManrope,
+        fontSize: 16,
+        fontStyle: FontStyle.normal,
+        fontWeight: FontWeight.w400,
+      ),
+      keyboardType: keyboardType,
+      controller: controller,
+      obscureText: obscureText,
+    );
+  }
+}
+
+class CustomCupertinoButton extends StatelessWidget {
+  final Color color;
+  final String text;
+  final VoidCallback onPressed;
+
+  const CustomCupertinoButton({
+    Key? key,
+    required this.color,
+    required this.text,
+    required this.onPressed,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoButton(
+      borderRadius: BorderRadius.circular(6.0),
+      color: color,
+      onPressed: onPressed,
+      child: FittedBox(
+        child: Text(
+          text,
+          style: TextStyle(
+            color: Colors.white,
+            fontFamily: AppStyles.fontFamilyManrope,
+            fontSize: 16,
+            fontStyle: FontStyle.normal,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
       ),
     );
   }
