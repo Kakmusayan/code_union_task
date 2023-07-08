@@ -35,7 +35,6 @@ class _ProfilePageState extends State<ProfilePage> {
               onPressed: () {
                 _logout();
                 Navigator.of(context).popUntil((route) => route.isFirst);
-                Navigator.of(context).pushNamed(LoginPage.routeName);
               },
               child: const Text('Выйти'),
             ),
