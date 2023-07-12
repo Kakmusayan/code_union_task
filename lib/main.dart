@@ -4,12 +4,19 @@ import 'package:code_union_task/lenta_page.dart';
 import 'package:code_union_task/map_page.dart';
 import 'package:code_union_task/profile_page.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 
 import 'favorites_page.dart';
 import 'login_page.dart';
+import 'login_view_model.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => LoginViewModel(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

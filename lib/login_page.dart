@@ -2,12 +2,14 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'package:code_union_task/constants/app_styles.dart';
 import 'package:code_union_task/constants/global_class.dart';
 import 'package:code_union_task/profile_page.dart';
 import 'package:code_union_task/widgets/custom_cupertino_text_field.dart';
 
+import 'login_view_model.dart';
 import 'service/auth_service.dart';
 import 'widgets/custom_cupertino_button.dart';
 
@@ -81,6 +83,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final loginViewModel = Provider.of<LoginViewModel>(context);
     return CupertinoPageScaffold(
       backgroundColor: const Color(0XFFF3F4F6),
       navigationBar: CupertinoNavigationBar(
@@ -152,7 +155,10 @@ class _LoginPageState extends State<LoginPage> {
                           } else if (_passwordController.text.isEmpty) {
                             showErrorMessage("Пароль не введен");
                           } else {
-                            _submit();
+                            loginViewModel.login(
+                              _loginController.text,
+                              _passwordController.text,
+                            );
                           }
                         },
                       ),
